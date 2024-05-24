@@ -3,22 +3,23 @@ const cors = require('cors');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http, {
-    // Allow all origins
     cors: {
         origin: '*',
+        methods: ["GET", "POST"]
     }
 });
 
-const port = 4000;
-const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/Nostalgia', { useNewUrlParser: true, useUnifiedTopology: true });
+const port = 5000;
+// const mongoose = require('mongoose');
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-    console.log('Connected to MongoDB');
-});
+// mongoose.connect('mongodb://localhost:27017/Nostalgia', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// const db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'connection error:'));
+// db.once('open', () => {
+//     console.log('Connected to MongoDB');
+// });
 
 // Middleware to parse JSON requests
 app.use(express.json());
@@ -56,21 +57,25 @@ app.put('/api/users', async (req, res) => {
         res.status(500).send('Error updating user');
     }
 });
-
 // WebSocket handling
 io.on('connection', (socket) => {
-    console.log('A user connected');
+   // console.log('A user connected');
+
+    socket.on('set username', (username) => {
+        socket.username = username;
+        console.log(`User connected with username: ${username}`);
+    });
 
     // Handle incoming messages
     socket.on('chat message', (msg) => {
-        console.log('message: ' + msg);
+        console.log(`Message from ${msg.sender}: ${msg.content}`);
         // Broadcast the message to all connected clients
         io.emit('chat message', msg);
     });
 
     // Handle disconnection
     socket.on('disconnect', () => {
-        console.log('User disconnected');
+        console.log(`User disconnected: ${socket.username}`);
     });
 });
 
