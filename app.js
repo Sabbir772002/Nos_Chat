@@ -8,8 +8,6 @@ const io = require('socket.io')(http, {
         methods: ["GET", "POST"]
     }
 });
-
-
 const port = 5000;
 // const mongoose = require('mongoose');
 
