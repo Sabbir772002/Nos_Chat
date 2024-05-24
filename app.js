@@ -57,6 +57,25 @@ app.get('/api/messages', (req, res) => {
             res.status(500).send('Error fetching messages');
         });
 });
+app.get('/api/userbox/:username', (req, res) => {
+    const { username } = req.params;
+    Message.find({
+        $or: [
+            { receiver: username },
+            { sender: username }
+        ]
+    }).sort({ time: -1 }) // Sort by descending order of message time
+    .then((messages) => {
+        // Extract unique usernames from the messages
+        const uniqueUsernames = [...new Set(messages.map(message => message.sender === username ? message.receiver : message.sender))];
+        res.status(200).json(uniqueUsernames);
+    })
+    .catch((err) => {
+        console.error('Error fetching usernames:', err);
+        res.status(500).json({ error: 'Error fetching usernames' });
+    });
+});
+
 app.post('/api/users', (req, res) => {
     const { username, password, email } = req.body;
     const newUser = new User({ username, password, email });
