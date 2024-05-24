@@ -3,9 +3,9 @@ const cors = require('cors');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http, {
-    // Allow all origins
     cors: {
         origin: '*',
+        methods: ["GET", "POST"]
     }
 });
 
@@ -56,21 +56,25 @@ app.put('/api/users', async (req, res) => {
         res.status(500).send('Error updating user');
     }
 });
-
 // WebSocket handling
 io.on('connection', (socket) => {
-    console.log('A user connected');
+   // console.log('A user connected');
+
+    socket.on('set username', (username) => {
+        socket.username = username;
+        console.log(`User connected with username: ${username}`);
+    });
 
     // Handle incoming messages
     socket.on('chat message', (msg) => {
-        console.log('message: ' + msg);
+        console.log(`Message from ${msg.sender}: ${msg.content}`);
         // Broadcast the message to all connected clients
         io.emit('chat message', msg);
     });
 
     // Handle disconnection
     socket.on('disconnect', () => {
-        console.log('User disconnected');
+        console.log(`User disconnected: ${socket.username}`);
     });
 });
 
