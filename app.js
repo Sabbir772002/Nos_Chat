@@ -33,8 +33,8 @@ const Message = require('./models/message');
 
 
 app.post('/api/messages', (req, res) => {
-    const { id, sender, receiver, content, time } = req.body;
-    const newMessage = new Message({ id, sender, receiver, content, time });
+    const { id, sender, receiver, content, time,date,img } = req.body;
+    const newMessage = new Message({ id, sender, receiver, content, time,date,img });
 
     newMessage.save()
         .then((savedMessage) => {
@@ -47,7 +47,13 @@ app.post('/api/messages', (req, res) => {
         });
 });
 app.get('/api/messages', (req, res) => {
-    Message.find()
+    const { id1, id2 } = req.query; 
+    Message.find({
+        $or: [
+            { sender: { $regex: new RegExp(`^${id1}$`, 'i') }, receiver: { $regex: new RegExp(`^${id2}$`, 'i') } },
+            { sender: { $regex: new RegExp(`^${id2}$`, 'i') }, receiver: { $regex: new RegExp(`^${id1}$`, 'i') } }
+        ]
+    }).sort({ time: -1 })
         .then((messages) => {
             console.log('Messages:', messages);
             res.status(200).json(messages);
@@ -59,15 +65,19 @@ app.get('/api/messages', (req, res) => {
 });
 app.get('/api/userbox/:username', (req, res) => {
     const { username } = req.params;
+    const usernameRegex = new RegExp(`^${username}$`, 'i'); // Create a case-insensitive regex for username
+
     Message.find({
         $or: [
-            { receiver: username },
-            { sender: username }
+            { receiver: usernameRegex },
+            { sender: usernameRegex }
         ]
     }).sort({ time: -1 }) // Sort by descending order of message time
     .then((messages) => {
         // Extract unique usernames from the messages
-        const uniqueUsernames = [...new Set(messages.map(message => message.sender === username ? message.receiver : message.sender))];
+        const uniqueUsernames = [...new Set(messages.map(message => 
+            message.sender.toLowerCase() === username.toLowerCase() ? message.receiver : message.sender
+        ))];
         res.status(200).json(uniqueUsernames);
     })
     .catch((err) => {
@@ -75,6 +85,7 @@ app.get('/api/userbox/:username', (req, res) => {
         res.status(500).json({ error: 'Error fetching usernames' });
     });
 });
+
 
 app.post('/api/users', (req, res) => {
     const { username, password, email } = req.body;
