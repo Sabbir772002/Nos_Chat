@@ -50,10 +50,13 @@ app.post('/api/messages', (req, res) => {
 });
 app.get('/api/messages', (req, res) => {
     const { id1, id2 } = req.query; 
+    const id11 = new RegExp(`^${id1}$`, 'i');
+    const id12 = new RegExp(`^${id2}$`, 'i');
+    
     Message.find({
         $or: [
-            { sender: { $regex: new RegExp(`^${id1}$`, 'i') }, receiver: { $regex: new RegExp(`^${id2}$`, 'i') } },
-            { sender: { $regex: new RegExp(`^${id2}$`, 'i') }, receiver: { $regex: new RegExp(`^${id1}$`, 'i') } }
+            { sender: { $regex: id11 }, receiver: { $regex: id12 } },
+            { sender: { $regex: id12 }, receiver: { $regex: id11 } }
         ]
     }).sort({date:1, time: 1 })
         .then((messages) => {
@@ -67,7 +70,7 @@ app.get('/api/messages', (req, res) => {
 });
 app.get('/api/userbox/:username', (req, res) => {
     const { username } = req.params;
-    const usernameRegex = new RegExp(`^${username}$`, 'i'); // Create a case-insensitive regex for username
+    const usernameRegex = new RegExp(`^${username}$`, 'i');
 
     Message.find({
         $or: [
