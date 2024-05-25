@@ -53,7 +53,7 @@ app.get('/api/messages', (req, res) => {
             { sender: { $regex: new RegExp(`^${id1}$`, 'i') }, receiver: { $regex: new RegExp(`^${id2}$`, 'i') } },
             { sender: { $regex: new RegExp(`^${id2}$`, 'i') }, receiver: { $regex: new RegExp(`^${id1}$`, 'i') } }
         ]
-    }).sort({ time: -1 })
+    }).sort({date:1, time: 1 })
         .then((messages) => {
             console.log('Messages:', messages);
             res.status(200).json(messages);
