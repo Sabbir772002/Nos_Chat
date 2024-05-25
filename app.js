@@ -3,6 +3,8 @@ const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
 app.use(cors()); // Use cors middleware
+const OnlineUser = require('./models/OnlineUser');
+const Seen = require('./models/Seen');
 
 const http = require('http').Server(app);
 const io = require('socket.io')(http, {
@@ -149,6 +151,7 @@ io.on('connection', (socket) => {
         delete clients[socket.id];
         console.log('Connected clients:', clients);
     });
+
 });
 
 // Serve your React app or static files
