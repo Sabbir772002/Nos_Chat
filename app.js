@@ -210,7 +210,6 @@ async function emitusers() {
         console.error('Error updating online users:', error);
     }
 }
-
 function getLastSeen(seenUserDocs, username) {
     const userDoc = seenUserDocs.find(user => user.user.toLowerCase() === username.toLowerCase());
     return userDoc ? `${userDoc.date} ${userDoc.time}` : 'Unknown';
@@ -234,14 +233,29 @@ async function updateOnlineUsers() {
     } catch (error) {
         console.error('Error updating online users:', error);
     }
-
     // Update last seen time for users not in the current online users list
     const usersNotOnlineAnymore = previousOnlineUsers.filter(username => !onlineUsers.includes(username));
     try {
-        await Seen.updateMany(
-            { user: { $in: usersNotOnlineAnymore } }, // Users from previousOnlineUsers not in the current online users list
-            { time: new Date().toLocaleTimeString(), date: new Date().toLocaleDateString() }
-        );
+        console.log("oneline users ",onlineUsers);
+        console.log("not online anymore....");
+        console.log(usersNotOnlineAnymore);
+        const bulkOperations = usersNotOnlineAnymore.map(user => {
+            return {
+                updateOne: {
+                    filter: { user: user },
+                    update: {
+                        $set: { 
+                            time: new Date().toLocaleTimeString(), 
+                            date: new Date().toLocaleDateString() 
+                        }
+                    },
+                    upsert: true
+                }
+            };
+        });
+        
+        await Seen.bulkWrite(bulkOperations);
+        
         console.log('Updated last seen time');
     } catch (error) {
         console.error('Error updating last seen time:', error);
