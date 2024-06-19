@@ -35,7 +35,12 @@ const Message = require('./models/message');
 
 app.post('/api/messages', (req, res) => {
     const { id, sender, receiver, content, time,date,img,image } = req.body;
-    const newMessage = new Message({ id, sender, receiver, content, time,date,img,image });
+    const [month, day, year] = date.split('/'); 
+
+    const parsedDate = new Date(`${year}-${month}-${day}`);
+
+    const newMessage = new Message({ id, sender, receiver, content, time, date: parsedDate,
+        img,image });
 
     newMessage.save()
         .then((savedMessage) => {
@@ -58,7 +63,7 @@ app.get('/api/messages', (req, res) => {
         ]
     }).sort({date:1, time: 1 })
         .then((messages) => {
-            // console.log('Messages:', messages);
+            console.log('Messages:', messages);
             res.status(200).json(messages);
         })
         .catch((err) => {
