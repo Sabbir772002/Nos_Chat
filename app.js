@@ -77,10 +77,9 @@ app.patch('/api/messages', (req, res) => {
     const [month, day, year] = date.split('/'); 
 
     const parsedDate = new Date(`${year}-${month}-${day}`);
-
+    
     const newMessage = new Message({ id, sender, receiver, content, time, date: parsedDate,
         img,image });
-
     newMessage.save()
         .then((savedMessage) => {
             console.log('Message saved:', savedMessage);
