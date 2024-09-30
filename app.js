@@ -52,6 +52,45 @@ app.post('/api/messages', (req, res) => {
             res.status(500).send('Error saving message');
         });
 });
+app.put('/api/messages', (req, res) => {
+    const { id, sender, receiver, content, time,date,img,image } = req.body;
+    const [month, day, year] = date.split('/'); 
+
+    const parsedDate = new Date(`${year}-${month}-${day}`);
+
+    const newMessage = new Message({ id, sender, receiver, content, time, date: parsedDate,
+        img,image });
+
+    newMessage.save()
+        .then((savedMessage) => {
+            console.log('Message saved:', savedMessage);
+            res.status(200).json(savedMessage);
+        })
+        .catch((err) => {
+            console.error('Error saving message:', err);
+            res.status(500).send('Error saving message');
+        });
+});
+
+app.patch('/api/messages', (req, res) => {
+    const { id, sender, receiver, content, time,date,img,image } = req.body;
+    const [month, day, year] = date.split('/'); 
+
+    const parsedDate = new Date(`${year}-${month}-${day}`);
+
+    const newMessage = new Message({ id, sender, receiver, content, time, date: parsedDate,
+        img,image });
+
+    newMessage.save()
+        .then((savedMessage) => {
+            console.log('Message saved:', savedMessage);
+            res.status(200).json(savedMessage);
+        })
+        .catch((err) => {
+            console.error('Error saving message:', err);
+            res.status(500).send('Error saving message');
+        });
+});
 app.get('/api/messages', (req, res) => {
     const { id1, id2 } = req.query; 
     const id11 = new RegExp(`^${id1}$`, 'i');
@@ -257,7 +296,6 @@ async function updateOnlineUsers() {
         });
         
         await Seen.bulkWrite(bulkOperations);
-        
         console.log('Updated last seen time');
     } catch (error) {
         console.error('Error updating last seen time:', error);
