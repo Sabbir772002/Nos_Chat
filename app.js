@@ -9,7 +9,7 @@ const io = require('socket.io')(http, {
     }
 });
 
-const port = 4000;
+const port = 5000;
 const mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost:27017/Nostalgia', { useNewUrlParser: true, useUnifiedTopology: true });
