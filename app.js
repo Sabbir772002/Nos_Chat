@@ -14,9 +14,12 @@ const io = require('socket.io')(http, {
         methods: ["GET", "POST"]
     }
 });
-app.use(bodyParser.json());
+ app.use(bodyParser.json());
 const port = 5000;
 const mongoose = require('mongoose');
+
+// const port = 4000;
+// const mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost:27017/Nostalgia', { useNewUrlParser: true, useUnifiedTopology: true });
 
